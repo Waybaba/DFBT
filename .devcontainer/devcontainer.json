@@ -15,7 +15,8 @@
 		"lldb.adapterType": "native",
 		"lldb.executable": "/usr/bin/lldb",
 		"terminal.integrated.defaultProfile.linux": "bash",
-		"python.defaultInterpreterPath": "/opt/conda/bin/python"
+		"python.defaultInterpreterPath": "/opt/conda/bin/python",
+		"python.analysis.autoImportCompletions": true
 	},
 	"remoteUser": "waybaba"
 }

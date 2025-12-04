@@ -39,15 +39,14 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 ### pip - base dependencies
-# Note: PyTorch 2.5.0 is already installed in base image, but we ensure version compatibility
+# Note: PyTorch 2.5.1 is already installed in base image
 RUN pip install --no-cache-dir \
-    torch==2.5 \
     tensorboard \
     tensorboardX \
     tqdm \
     rich \
     numpy \
-    cython
+    "cython<3"
 
 ### pip - gymnasium and mujoco (for v5 environments)
 RUN pip install --no-cache-dir \
@@ -57,10 +56,11 @@ RUN pip install --no-cache-dir \
 ### mujoco210 for mujoco-py (needed by d4rl)
 USER root
 RUN mkdir -p /usr/local/mujoco && \
-    wget -q https://mujoco.org/download/mujoco210-linux-x86_64.tar.gz -O /tmp/mujoco210.tar.gz && \
+    (wget -q https://github.com/deepmind/mujoco/releases/download/2.1.0/mujoco210-linux-x86_64.tar.gz -O /tmp/mujoco210.tar.gz || \
+     wget -q https://mujoco.org/download/mujoco210-linux-x86_64.tar.gz -O /tmp/mujoco210.tar.gz) && \
     tar -zxvf /tmp/mujoco210.tar.gz -C /usr/local/mujoco/ && \
     rm /tmp/mujoco210.tar.gz && \
-    mv /usr/local/mujoco/mujoco210 /usr/local/mujoco/mujoco210 || true
+    test -d /usr/local/mujoco/mujoco210 || (cd /usr/local/mujoco && mv mujoco210* mujoco210 2>/dev/null || true)
 
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/mujoco/mujoco210/bin
 ENV MUJOCO_PY_MUJOCO_PATH=/usr/local/mujoco/mujoco210
@@ -69,15 +69,21 @@ ENV MUJOCO_PY_MUJOCO_PATH=/usr/local/mujoco/mujoco210
 RUN pip install --no-cache-dir \
     'mujoco-py<2.2,>=2.1'
 
-### pip - d4rl
+### pip - d4rl (install with dependencies)
+# d4rl requires some additional dependencies
 RUN pip install --no-cache-dir \
+    gym==0.25.0 \
+    dm_control \
+    && pip install --no-cache-dir \
     git+https://github.com/Farama-Foundation/d4rl@master#egg=d4rl
 
 ### Prebuild mujoco-py (first import with non-root user causes error)
 RUN python -c "import mujoco_py; print('mujoco-py version:', mujoco_py.__version__)" || true
 
 ### Fix permissions for mujoco_py generated files
-RUN chmod -R a+rwx /opt/conda/lib/python3.10/site-packages/mujoco_py/generated 2>/dev/null || true
+# Find Python site-packages directory dynamically
+RUN PYTHON_SITE=$(python -c "import site; print(site.getsitepackages()[0])") && \
+    chmod -R a+rwx $PYTHON_SITE/mujoco_py/generated 2>/dev/null || true
 
 ### Non-root user creation
 ARG USER_UID=1000
@@ -92,7 +98,7 @@ RUN groupadd --gid $USER_GID $USERNAME || true && \
     chown -R ${USER_UID}:${USER_GID} /usr/local/mujoco
 
 USER $USERNAME
-ENV HOME /home/$USERNAME
+ENV HOME=/home/$USERNAME
 WORKDIR $HOME
 
 ### Verify installations
@@ -100,5 +106,5 @@ RUN python -c "import gymnasium; print('gymnasium:', gymnasium.__version__)" && 
     python -c "import mujoco; print('mujoco:', mujoco.__version__)" && \
     python -c "import d4rl; print('d4rl imported successfully')" || echo "d4rl import check skipped"
 
-CMD sleep infinity
+CMD ["sleep", "infinity"]
 
