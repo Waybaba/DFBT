@@ -1,4 +1,5 @@
 logs_dfbt_sac/
+logs_dfbt/
 
 # Python bytecode
 __pycache__/

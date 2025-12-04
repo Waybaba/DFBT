@@ -3,11 +3,7 @@
 	"context": ".",
 	"dockerFile": "Dockerfile",
 	"runArgs": [
-		"--name", "dfbt-dev-${localEnv:UDEVICEID:-docker}",
-		"--gpus=all",
-		"--volume", "${localEnv:UDATADIR:-/data}:/data",
-		"--volume", "${localEnv:UPRJDIR:-/code}:/code",
-		"--volume", "${localEnv:UOUTDIR:-/output}:/output"
+		"--gpus=all"
 	],
 	"overrideCommand": false,
 	"postCreateCommand": "python -c \"import torch; print(f'CUDA available: {torch.cuda.is_available()}, Device count: {torch.cuda.device_count()}')\" && python -c \"import gymnasium; import mujoco; import d4rl; print('All dependencies installed successfully!')\" || echo 'Dependency check failed'",
