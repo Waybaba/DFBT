@@ -33,17 +33,17 @@ echo ""
 echo "Stage 2: Training SAC Agents"
 echo "----------------------------------------"
 
-echo "Training HalfCheetah-v5 SAC..."
-python3 scripts/train_dfbt_sac.py --env_name HalfCheetah-v5 --delay 128 --total_step 5000000 --seed 2025
+echo "Training HalfCheetah-v2 SAC..."
+python3 scripts/train_dfbt_sac.py --env_name HalfCheetah-v2 --delay 128 --total_step 5000000 --seed 2025
 
-echo "Training Hopper-v5 SAC..."
-python3 scripts/train_dfbt_sac.py --env_name Hopper-v5 --delay 128 --total_step 5000000 --seed 2025
+echo "Training Hopper-v2 SAC..."
+python3 scripts/train_dfbt_sac.py --env_name Hopper-v2 --delay 128 --total_step 5000000 --seed 2025
 
-echo "Training Walker2d-v5 SAC..."
-python3 scripts/train_dfbt_sac.py --env_name Walker2d-v5 --delay 128 --total_step 5000000 --seed 2025
+echo "Training Walker2d-v2 SAC..."
+python3 scripts/train_dfbt_sac.py --env_name Walker2d-v2 --delay 128 --total_step 5000000 --seed 2025
 
-echo "Training Ant-v5 SAC..."
-python3 scripts/train_dfbt_sac.py --env_name Ant-v5 --delay 128 --total_step 5000000 --seed 2025
+echo "Training Ant-v2 SAC..."
+python3 scripts/train_dfbt_sac.py --env_name Ant-v2 --delay 128 --total_step 5000000 --seed 2025
 
 echo ""
 echo "=========================================="
