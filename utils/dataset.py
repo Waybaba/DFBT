@@ -8,19 +8,30 @@ from collections import deque
 
 def make_d4rl_env(env_name):
     """Try to create D4RL environment with different naming conventions."""
-    # Try new format first: bullet-{name}-{policy}-v0
-    try:
-        env = gym.make(f"bullet-{env_name}")
-        return env
-    except gym.error.NameNotFound:
-        pass
+    # Parse env_name (e.g., "halfcheetah-random" -> name="halfcheetah", policy="random")
+    parts = env_name.split('-')
+    if len(parts) >= 2:
+        name = parts[0]
+        policy = '-'.join(parts[1:])
+    else:
+        name = env_name
+        policy = ""
+    
+    # Try new format: bullet-{name}-{policy}-v0
+    if policy:
+        try:
+            env = gym.make(f"bullet-{name}-{policy}-v0")
+            return env
+        except gym.error.NameNotFound:
+            pass
     
     # Try old format: {name}-{policy}-v2
-    try:
-        env = gym.make(f"{env_name}-v2")
-        return env
-    except gym.error.NameNotFound:
-        pass
+    if policy:
+        try:
+            env = gym.make(f"{name}-{policy}-v2")
+            return env
+        except gym.error.NameNotFound:
+            pass
     
     # Try without version suffix
     try:
@@ -30,7 +41,7 @@ def make_d4rl_env(env_name):
         pass
     
     # If all fail, raise the original error
-    raise gym.error.NameNotFound(f"Environment {env_name} not found. Tried: bullet-{env_name}, {env_name}-v2, {env_name}")
+    raise gym.error.NameNotFound(f"Environment {env_name} not found. Tried: bullet-{name}-{policy}-v0, {name}-{policy}-v2, {env_name}")
 
 def compute_mean_std(data, eps=1e-3):
     mean = data.mean(0)
