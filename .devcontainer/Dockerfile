@@ -1,7 +1,7 @@
 # DFBT Dockerfile
 # Based on PyTorch image with Python 3.10
 # Updated to PyTorch 2.5.0 with CUDA 12.4 to support RTX 5080 (sm_120)
-FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
+FROM pytorch/pytorch:2.9.1-cuda13.0-cudnn9-runtime
 
 ENV NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES},display \
     DEBIAN_FRONTEND=noninteractive \

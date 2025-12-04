@@ -115,8 +115,6 @@ class BeliefTrainer():
 
     def train_directly_forecasting_belief(self):
         for indices in self.replay_buffer._sample_prior:
-            print(len(indices))
-            exit()
             states, actions, rewards, dones, masks = self.replay_buffer.sample(indices)
             states = states.to(self.config['device'])
             actions = actions.to(self.config['device'])
