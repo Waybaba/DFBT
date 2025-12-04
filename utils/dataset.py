@@ -1,5 +1,5 @@
-import d4rl
-import gymnasium as gym
+import d4rl  # Import d4rl FIRST to register D4RL environments
+import gym
 import numpy as np
 import torch
 from tqdm import trange
