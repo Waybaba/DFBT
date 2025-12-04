@@ -69,13 +69,18 @@ ENV MUJOCO_PY_MUJOCO_PATH=/usr/local/mujoco/mujoco210
 RUN pip install --no-cache-dir \
     'mujoco-py<2.2,>=2.1'
 
-### pip - d4rl (install with dependencies)
-# d4rl requires some additional dependencies
+### pip - d4rl dependencies
+# d4rl requires dm_control and other dependencies
 RUN pip install --no-cache-dir \
-    gym==0.25.0 \
     dm_control \
-    && pip install --no-cache-dir \
-    git+https://github.com/Farama-Foundation/d4rl@master#egg=d4rl
+    absl-py \
+    termcolor \
+    protobuf
+
+### pip - d4rl
+RUN pip install --no-cache-dir \
+    git+https://github.com/Farama-Foundation/d4rl@master#egg=d4rl || \
+    pip install --no-cache-dir d4rl
 
 ### Prebuild mujoco-py (first import with non-root user causes error)
 RUN python -c "import mujoco_py; print('mujoco-py version:', mujoco_py.__version__)" || true
