@@ -12,8 +12,8 @@ from utils.tool import get_configs
 from utils.dataset import DelayBuffer
 from tqdm import trange, tqdm
 from tensorboardX import SummaryWriter
+import d4rl  # Import d4rl FIRST to register D4RL environments
 import gym
-import d4rl  # Import d4rl to register D4RL environments
 import numpy as np
 import argparse
 
