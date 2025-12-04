@@ -17,6 +17,32 @@ import gym
 import numpy as np
 import argparse
 
+def make_d4rl_env(env_name):
+    """Try to create D4RL environment with different naming conventions."""
+    # Try new format first: bullet-{name}-{policy}-v0
+    try:
+        env = gym.make(f"bullet-{env_name}")
+        return env
+    except gym.error.NameNotFound:
+        pass
+    
+    # Try old format: {name}-{policy}-v2
+    try:
+        env = gym.make(f"{env_name}-v2")
+        return env
+    except gym.error.NameNotFound:
+        pass
+    
+    # Try without version suffix
+    try:
+        env = gym.make(env_name)
+        return env
+    except gym.error.NameNotFound:
+        pass
+    
+    # If all fail, raise the original error
+    raise gym.error.NameNotFound(f"Environment {env_name} not found. Tried: bullet-{env_name}, {env_name}-v2, {env_name}")
+
 class BeliefTrainer():
     def __init__(self, config):
         self.config = config
@@ -26,7 +52,7 @@ class BeliefTrainer():
             "|parametrix|value|\n|-|-|\n%s" % ("\n".join([f"|{key}|{value}|" for key, value in config.items()])),
         )
         self.log_dict = {}
-        env = gym.make(f"{config['dataset_name']}-random-v2")
+        env = make_d4rl_env(f"{config['dataset_name']}-random")
         self.observation_dim = env.observation_space.shape[0]
         self.action_dim = env.action_space.shape[0]
 
@@ -37,7 +63,7 @@ class BeliefTrainer():
             delay=self.config['delay'],
         )
         for policy in ['random', 'medium', 'expert']:
-            dataset_name = f"{config['dataset_name']}-{policy}-v2"
+            dataset_name = f"{config['dataset_name']}-{policy}"
             self.replay_buffer.load_d4rl_dataset(dataset_name)
         self.replay_buffer.normalize_reward()
 
