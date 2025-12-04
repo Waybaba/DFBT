@@ -99,6 +99,8 @@ class BeliefTrainer():
         )
 
         self.replay_buffer.generate_sample_prior()
+        # Create checkpoint directory if it doesn't exist
+        os.makedirs("dfbt_checkpoints", exist_ok=True)
         for self.epoch in trange(1, self.config['total_epoch'] + 1):
             self.train_directly_forecasting_belief()
             if self.epoch % 10 == 0:
