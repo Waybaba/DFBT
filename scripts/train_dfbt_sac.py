@@ -17,7 +17,8 @@ from tensorboardX import SummaryWriter
 from rich import print
 from copy import deepcopy
 from collections import deque
-import gymnasium as gym
+import d4rl  # Import d4rl FIRST to register D4RL environments
+import gym
 import argparse
 
 class Trainer():
