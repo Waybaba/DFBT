@@ -17,7 +17,7 @@ from tensorboardX import SummaryWriter
 from rich import print
 from copy import deepcopy
 from collections import deque
-import gym
+import gymnasium as gym
 import argparse
 
 class Trainer():
@@ -40,14 +40,16 @@ class Trainer():
             input_dim=observation_dim, 
             hidden_dim=256, 
             latent_dim=config['latent_dim']).to(config['device'])
-        if config['env_name'] == 'HalfCheetah-v2':
+        if config['env_name'] in ['HalfCheetah-v2', 'HalfCheetah-v5']:
             config['dataset_name'] = 'halfcheetah'
-        elif config['env_name'] == 'Hopper-v2':
+        elif config['env_name'] in ['Hopper-v2', 'Hopper-v5']:
             config['dataset_name'] = 'hopper'
-        elif config['env_name'] == 'Walker2d-v2':
+        elif config['env_name'] in ['Walker2d-v2', 'Walker2d-v5']:
             config['dataset_name'] = 'walker2d'
+        elif config['env_name'] in ['Ant-v2', 'Ant-v5']:
+            config['dataset_name'] = 'ant'
         else:
-            NotImplementedError
+            raise NotImplementedError(f"Environment {config['env_name']} not supported")
         checkpoint = torch.load(f"dfbt_checkpoints/{config['dataset_name']}_Delay_{config['delay']}.pth", map_location=torch.device('cpu'))
 
         self.reward_mean = checkpoint['reward_mean']

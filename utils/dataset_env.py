@@ -1,10 +1,9 @@
 import d4rl
-import gym
+import gymnasium as gym
 import numpy as np
 import torch
 from tqdm import trange
 from rich import print
-import gym
 from collections import deque
 
 def compute_mean_std(data, eps=1e-3):

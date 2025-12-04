@@ -12,7 +12,7 @@ from utils.tool import get_configs
 from utils.dataset import DelayBuffer
 from tqdm import trange, tqdm
 from tensorboardX import SummaryWriter
-import gym
+import gymnasium as gym
 import numpy as np
 import argparse
 
