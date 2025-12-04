@@ -1,0 +1,29 @@
+# DFBT Training Commands for MuJoCo v5 Environments (5M steps)
+# Based on arXiv:2505.00546 - Directly Forecasting Belief for Reinforcement Learning with Delays
+# 
+# Prerequisites:
+# 1. Ensure conda environment is activated: conda activate dfbt
+# 2. Make sure all dependencies are installed (see readme.md)
+# 3. Install gymnasium for v5 environment support:
+#    pip install gymnasium[mujoco]
+#    (or: pip install gymnasium && pip install mujoco)
+# 4. Ensure dfbt_checkpoints are available for each environment
+#
+# Note: Code has been updated to support v5 environments
+
+# HalfCheetah-v5 (5M steps)
+python3 scripts/train_dfbt_sac.py --env_name HalfCheetah-v5 --delay 128 --total_step 5000000 --seed 2025
+
+# Hopper-v5 (5M steps)
+python3 scripts/train_dfbt_sac.py --env_name Hopper-v5 --delay 128 --total_step 5000000 --seed 2025
+
+# Ant-v5 (5M steps)
+python3 scripts/train_dfbt_sac.py --env_name Ant-v5 --delay 128 --total_step 5000000 --seed 2025
+
+# Walker2d-v5 (5M steps)
+python3 scripts/train_dfbt_sac.py --env_name Walker2d-v5 --delay 128 --total_step 5000000 --seed 2025
+
+# Optional: Run with different seeds for multiple runs
+# python3 scripts/train_dfbt_sac.py --env_name HalfCheetah-v5 --delay 128 --total_step 5000000 --seed 2026
+# python3 scripts/train_dfbt_sac.py --env_name HalfCheetah-v5 --delay 128 --total_step 5000000 --seed 2027
+
