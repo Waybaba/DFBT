@@ -42,12 +42,12 @@ RUN apt-get update && apt-get install -y \
 # Note: PyTorch 2.5.0 is already installed in base image, but we ensure version compatibility
 RUN pip install --no-cache-dir \
     torch==2.5 \
-    tensorboard==2.14.1 \
-    tensorboardX==2.6.2.2 \
-    tqdm==4.66.1 \
-    rich==13.5.3 \
-    numpy==1.24.4 \
-    "cython<3"
+    tensorboard \
+    tensorboardX \
+    tqdm \
+    rich \
+    numpy \
+    cython
 
 ### pip - gymnasium and mujoco (for v5 environments)
 RUN pip install --no-cache-dir \
