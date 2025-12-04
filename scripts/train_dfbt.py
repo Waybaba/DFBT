@@ -17,6 +17,31 @@ import gym
 import numpy as np
 import argparse
 
+def make_d4rl_env_v2_compat(env_name):
+    """Try v2 format first, fallback to bullet format for compatibility."""
+    # Try original v2 format first
+    try:
+        env = gym.make(f"{env_name}-v2")
+        return env
+    except gym.error.NameNotFound:
+        pass
+    
+    # Fallback to bullet format (for newer D4RL versions)
+    try:
+        # Parse: "halfcheetah-random" -> "bullet-halfcheetah-random-v0"
+        parts = env_name.split('-')
+        if len(parts) >= 2:
+            name = parts[0]
+            policy = '-'.join(parts[1:])
+            bullet_name = f"bullet-{name}-{policy}-v0"
+            env = gym.make(bullet_name)
+            return env
+    except gym.error.NameNotFound:
+        pass
+    
+    # If all fail, raise error
+    raise gym.error.NameNotFound(f"Environment {env_name}-v2 not found. Tried: {env_name}-v2, bullet-{env_name}-v0")
+
 class BeliefTrainer():
     def __init__(self, config):
         self.config = config
@@ -26,7 +51,7 @@ class BeliefTrainer():
             "|parametrix|value|\n|-|-|\n%s" % ("\n".join([f"|{key}|{value}|" for key, value in config.items()])),
         )
         self.log_dict = {}
-        env = gym.make(f"{config['dataset_name']}-random-v2")
+        env = make_d4rl_env_v2_compat(f"{config['dataset_name']}-random")
         self.observation_dim = env.observation_space.shape[0]
         self.action_dim = env.action_space.shape[0]
 
@@ -37,7 +62,7 @@ class BeliefTrainer():
             delay=self.config['delay'],
         )
         for policy in ['random', 'medium', 'expert']:
-            dataset_name = f"{config['dataset_name']}-{policy}-v2"
+            dataset_name = f"{config['dataset_name']}-{policy}"
             self.replay_buffer.load_d4rl_dataset(dataset_name)
         self.replay_buffer.normalize_reward()
 

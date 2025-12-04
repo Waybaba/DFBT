@@ -6,6 +6,31 @@ from tqdm import trange
 from rich import print
 from collections import deque
 
+def make_d4rl_env_v2_compat(env_name):
+    """Try v2 format first, fallback to bullet format for compatibility."""
+    # Try original v2 format first
+    try:
+        env = gym.make(f"{env_name}-v2")
+        return env
+    except gym.error.NameNotFound:
+        pass
+    
+    # Fallback to bullet format (for newer D4RL versions)
+    try:
+        # Parse: "halfcheetah-random" -> "bullet-halfcheetah-random-v0"
+        parts = env_name.split('-')
+        if len(parts) >= 2:
+            name = parts[0]
+            policy = '-'.join(parts[1:])
+            bullet_name = f"bullet-{name}-{policy}-v0"
+            env = gym.make(bullet_name)
+            return env
+    except gym.error.NameNotFound:
+        pass
+    
+    # If all fail, raise error
+    raise gym.error.NameNotFound(f"Environment {env_name}-v2 not found. Tried: {env_name}-v2, bullet-{env_name}-v0")
+
 def compute_mean_std(data, eps=1e-3):
     mean = data.mean(0)
     std = data.std(0) + eps
@@ -48,7 +73,10 @@ class ReplayBuffer:
         return torch.tensor(data, dtype=torch.float32, device=self._device)
 
     def load_d4rl_dataset(self, dataset_name):
-        env = gym.make(dataset_name)
+        # Remove -v2 suffix if present, then try both formats
+        if dataset_name.endswith('-v2'):
+            dataset_name = dataset_name[:-3]
+        env = make_d4rl_env_v2_compat(dataset_name)
         dataset = env.get_dataset()
         n_transitions = dataset["observations"].shape[0]
         self._observations[self._pointer: self._pointer+n_transitions] = self._to_tensor(dataset["observations"])
@@ -109,7 +137,10 @@ class DelayBuffer:
         return torch.tensor(data, dtype=torch.float32, device=self._device)
 
     def load_d4rl_dataset(self, dataset_name):
-        env = gym.make(dataset_name)
+        # Remove -v2 suffix if present, then try both formats
+        if dataset_name.endswith('-v2'):
+            dataset_name = dataset_name[:-3]
+        env = make_d4rl_env_v2_compat(dataset_name)
         dataset = env.get_dataset()
         n_transitions = dataset["observations"].shape[0]
         delay_seq = {
