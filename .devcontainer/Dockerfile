@@ -1,7 +1,7 @@
 # DFBT Dockerfile
 # Based on PyTorch image with Python 3.10
-# Note: PyTorch 2.0.1 images use Python 3.10 by default
-FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
+# Updated to PyTorch 2.5.0 with CUDA 12.4 to support RTX 5080 (sm_120)
+FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
 
 ENV NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES},display \
     DEBIAN_FRONTEND=noninteractive \
@@ -15,14 +15,6 @@ ENV UDATADIR=/data \
     UOUTDIR=/output \
     UDEVICEID=docker
 
-# in China (switch apt source)
-RUN curl --noproxy "*" -s --connect-timeout 10 www.google.com > /dev/null; \
-    if [ $? -ne 0 ]; then \
-        echo "In China"; \
-        sed -i 's/archive.ubuntu.com/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list; \
-        sed -i 's/security.ubuntu.com/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list; \
-        echo "[global]\nindex-url = https://pypi.tuna.tsinghua.edu.cn/simple/\ntrusted-host = https://pypi.tuna.tsinghua.edu.cn" > /etc/pip.conf; \
-    fi
 
 ### apt packages
 RUN apt-get update && apt-get install -y \
@@ -47,8 +39,9 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 ### pip - base dependencies
+# Note: PyTorch 2.5.0 is already installed in base image, but we ensure version compatibility
 RUN pip install --no-cache-dir \
-    torch==2.0.1 \
+    torch==2.5 \
     tensorboard==2.14.1 \
     tensorboardX==2.6.2.2 \
     tqdm==4.66.1 \
