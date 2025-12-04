@@ -135,7 +135,7 @@ class DelayBuffer:
         return torch.tensor(data, dtype=torch.float32, device=self._device)
 
     def load_d4rl_dataset(self, dataset_name):
-        env = gym.make(dataset_name)
+        env = make_d4rl_env(dataset_name)
         dataset = env.get_dataset()
         n_transitions = dataset["observations"].shape[0]
         delay_seq = {
