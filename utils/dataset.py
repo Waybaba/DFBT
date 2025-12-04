@@ -6,43 +6,6 @@ from tqdm import trange
 from rich import print
 from collections import deque
 
-def make_d4rl_env(env_name):
-    """Try to create D4RL environment with different naming conventions."""
-    # Parse env_name (e.g., "halfcheetah-random" -> name="halfcheetah", policy="random")
-    parts = env_name.split('-')
-    if len(parts) >= 2:
-        name = parts[0]
-        policy = '-'.join(parts[1:])
-    else:
-        name = env_name
-        policy = ""
-    
-    # Try new format: bullet-{name}-{policy}-v0
-    if policy:
-        try:
-            env = gym.make(f"bullet-{name}-{policy}-v0")
-            return env
-        except gym.error.NameNotFound:
-            pass
-    
-    # Try old format: {name}-{policy}-v2
-    if policy:
-        try:
-            env = gym.make(f"{name}-{policy}-v2")
-            return env
-        except gym.error.NameNotFound:
-            pass
-    
-    # Try without version suffix
-    try:
-        env = gym.make(env_name)
-        return env
-    except gym.error.NameNotFound:
-        pass
-    
-    # If all fail, raise the original error
-    raise gym.error.NameNotFound(f"Environment {env_name} not found. Tried: bullet-{name}-{policy}-v0, {name}-{policy}-v2, {env_name}")
-
 def compute_mean_std(data, eps=1e-3):
     mean = data.mean(0)
     std = data.std(0) + eps
@@ -85,7 +48,7 @@ class ReplayBuffer:
         return torch.tensor(data, dtype=torch.float32, device=self._device)
 
     def load_d4rl_dataset(self, dataset_name):
-        env = make_d4rl_env(dataset_name)
+        env = gym.make(dataset_name)
         dataset = env.get_dataset()
         n_transitions = dataset["observations"].shape[0]
         self._observations[self._pointer: self._pointer+n_transitions] = self._to_tensor(dataset["observations"])
@@ -146,7 +109,7 @@ class DelayBuffer:
         return torch.tensor(data, dtype=torch.float32, device=self._device)
 
     def load_d4rl_dataset(self, dataset_name):
-        env = make_d4rl_env(dataset_name)
+        env = gym.make(dataset_name)
         dataset = env.get_dataset()
         n_transitions = dataset["observations"].shape[0]
         delay_seq = {
